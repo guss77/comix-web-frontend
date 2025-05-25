@@ -1,0 +1,5 @@
+/vendor
+.env
+db_data/
+.idea
+*.log
