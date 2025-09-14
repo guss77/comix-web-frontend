@@ -14,24 +14,27 @@ if (file_exists($dotenv)) {
 require_once __DIR__ . '/db.php';
 $db = new Database();
 
-// Example: List comics table
-$tables = $db->fetchAllColumn('SHOW TABLES');
+// Set JSON header for all responses
+header('Content-Type: application/json');
 
-?><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Comix Web Frontend</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Welcome to Comix Web Frontend</h1>
-    <h2>Tables</h2>
-    <ul>
-        <?php foreach ($tables as $table): ?>
-            <li><?= htmlspecialchars($table) ?></li>
-        <?php endforeach; ?>
-    </ul>
-    <!-- Add your webcomics spider frontend here -->
-</body>
-</html>
+// Get PATH_INFO for routing
+$path = $_SERVER['PATH_INFO'] ?? '/';
+
+switch ($path) {
+    case '/feeds':
+        $feeds = $db->fetchAllObjects('SELECT name, last_update FROM feeds ORDER BY last_update DESC');
+        echo json_encode($feeds);
+        break;
+    case '/':
+        // Optionally, provide API root info
+        echo json_encode([
+            'endpoints' => [
+                '/feeds' => 'List all web comic feeds (name, last_update)'
+            ]
+        ]);
+        break;
+    default:
+        http_response_code(404);
+        echo json_encode(['error' => 'Not found']);
+        break;
+}
