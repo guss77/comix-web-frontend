@@ -1,11 +1,22 @@
 version: "3.9"
 
 services:
+  frontend:
+    build:
+      context: ./app
+      dockerfile: frontend.Dockerfile
+    container_name: comix-web-frontend-frontend
+    ports:
+      - "4200:80"
+    volumes:
+      - ./app:/usr/src/app
+    depends_on:
+      - web
   web:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: comix-web-frontend-web
+      dockerfile: docker/Dockerfile
+    container_name: comix-web-frontend-api
     ports:
       - "8080:80"
     volumes:
