@@ -12,7 +12,7 @@ RUN a2enmod rewrite
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
 # Copy application files
-COPY app/ /var/www/html/
+COPY backend/ /var/www/html/
 
 # Set file permissions
 RUN chown -R www-data:www-data /var/www/html
