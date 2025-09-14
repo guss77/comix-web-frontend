@@ -10,10 +10,13 @@ if (file_exists($dotenv)) {
     }
 }
 
-$dbHost = 'db';
-$dbName = $_ENV['DB_NAME'] ?? 'comixdb';
-$dbUser = $_ENV['DB_USER'] ?? 'comix';
-$dbPass = $_ENV['DB_PASSWORD'] ?? 'anothersecret';
+
+// Load database configuration from standalone file
+$dbConfig = require __DIR__ . '/db_config.php';
+$dbHost = $dbConfig['host'];
+$dbName = $dbConfig['dbname'];
+$dbUser = $dbConfig['user'];
+$dbPass = $dbConfig['password'];
 
 try {
     $pdo = new PDO(
