@@ -11,13 +11,11 @@ if (file_exists($dotenv)) {
 }
 
 
-
 require_once __DIR__ . '/db.php';
-$pdo = get_pdo();
+$db = new Database();
 
 // Example: List comics table
-$stmt = $pdo->query('SHOW TABLES');
-$tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$tables = $db->fetchAllColumn('SHOW TABLES');
 
 ?><!DOCTYPE html>
 <html lang="en">
