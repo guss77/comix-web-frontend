@@ -29,17 +29,15 @@ $routes = [
     // Create a new feed
     ['POST', '#^/feeds$#', function() use ($db) {
         $input = json_decode(file_get_contents('php://input'), true);
-        if (!isset($input['name'], $input['homepage'], $input['delay'], $input['active'])) {
+        if (!isset($input['name'], $input['homepage'])) {
             http_response_code(400);
-            echo json_encode(['error' => 'Missing required fields: name, homepage, delay, active']);
+            echo json_encode(['error' => 'Missing required fields: name, homepage']);
             return;
         }
-        $stmt = $db->getPdo()->prepare('INSERT INTO feeds (name, homepage, delay, active) VALUES (?, ?, ?, ?)');
+        $stmt = $db->getPdo()->prepare('INSERT INTO feeds (name, homepage) VALUES (?, ?)');
         $ok = $stmt->execute([
             $input['name'],
-            $input['homepage'],
-            $input['delay'],
-            $input['active']
+            $input['homepage']
         ]);
         if ($ok) {
             http_response_code(201);
@@ -93,14 +91,108 @@ $routes = [
     // API root info
     ['GET', '#^/$#', function() {
         echo json_encode([
-            'endpoints' => [
+            'openapi' => '3.0.0',
+            'info' => [
+                'title' => 'Comix Web Frontend API',
+                'version' => '1.0.0',
+                'description' => 'API for managing web comic feeds.'
+            ],
+            'paths' => [
                 '/feeds' => [
-                    'GET' => 'List all feeds',
-                    'POST' => 'Create feed'
+                    'get' => [
+                        'summary' => 'List all feeds',
+                        'responses' => [
+                            '200' => [
+                                'description' => 'A list of feeds',
+                                'content' => [
+                                    'application/json' => [
+                                        'schema' => [
+                                            'type' => 'array',
+                                            'items' => [ 'type' => 'object' ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    'post' => [
+                        'summary' => 'Create feed',
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'name' => [ 'type' => 'string' ],
+                                            'homepage' => [ 'type' => 'string' ]
+                                        ],
+                                        'required' => ['name', 'homepage']
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'responses' => [
+                            '201' => [
+                                'description' => 'Feed created',
+                                'content' => [
+                                    'application/json' => [
+                                        'schema' => [ 'type' => 'object' ]
+                                    ]
+                                ]
+                            ],
+                            '400' => [ 'description' => 'Missing required fields' ]
+                        ]
+                    ]
                 ],
                 '/feed/{id}' => [
-                    'DELETE' => 'Delete feed by id',
-                    'PATCH' => 'Update feed (name, homepage, delay, active) by id'
+                    'delete' => [
+                        'summary' => 'Delete feed by id',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'schema' => [ 'type' => 'integer' ]
+                            ]
+                        ],
+                        'responses' => [
+                            '200' => [ 'description' => 'Feed deleted' ],
+                            '404' => [ 'description' => 'Feed not found' ]
+                        ]
+                    ],
+                    'patch' => [
+                        'summary' => 'Update feed (name, homepage, delay, active) by id',
+                        'parameters' => [
+                            [
+                                'name' => 'id',
+                                'in' => 'path',
+                                'required' => true,
+                                'schema' => [ 'type' => 'integer' ]
+                            ]
+                        ],
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'name' => [ 'type' => 'string' ],
+                                            'homepage' => [ 'type' => 'string' ],
+                                            'delay' => [ 'type' => 'integer' ],
+                                            'active' => [ 'type' => 'boolean' ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'responses' => [
+                            '200' => [ 'description' => 'Feed updated' ],
+                            '400' => [ 'description' => 'No updatable fields provided' ],
+                            '404' => [ 'description' => 'Feed not found' ]
+                        ]
+                    ]
                 ]
             ]
         ]);
