@@ -1,0 +1,42 @@
+<div class="feed-list-container">
+  <h2>Web Comic Feeds</h2>
+  <button mat-raised-button color="primary" (click)="addFeedDialog.open = true">Add Feed</button>
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <mat-table [dataSource]="feeds" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *matCellDef="let feed">{{ feed.name }}</mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="homepage">
+      <mat-header-cell *matHeaderCellDef>Homepage</mat-header-cell>
+      <mat-cell *matCellDef="let feed"><a [href]="feed.homepage" target="_blank">{{ feed.homepage }}</a></mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+      <mat-cell *matCellDef="let feed">
+        <button mat-icon-button color="accent" (click)="updateFeed(feed.id, { name: feed.name, homepage: feed.homepage })">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteFeed(feed.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="['name', 'homepage', 'actions']"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: ['name', 'homepage', 'actions'];"></mat-row>
+  </mat-table>
+  <!-- Add Feed Dialog (simple inline form for brevity) -->
+  <div *ngIf="addFeedDialog.open" class="add-feed-dialog">
+    <h3>Add New Feed</h3>
+    <form #addFeedForm="ngForm" (ngSubmit)="addFeed({ name: addFeedDialog.name, homepage: addFeedDialog.homepage }); addFeedDialog = { open: false, name: '', homepage: '' }">
+      <mat-form-field>
+        <input matInput placeholder="Name" name="name" [(ngModel)]="addFeedDialog.name" required />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Homepage" name="homepage" [(ngModel)]="addFeedDialog.homepage" required />
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!addFeedDialog.name || !addFeedDialog.homepage">Add</button>
+      <button mat-button type="button" (click)="addFeedDialog.open = false">Cancel</button>
+    </form>
+  </div>
+</div>
