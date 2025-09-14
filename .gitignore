@@ -3,6 +3,3 @@
 db_data/
 .idea
 *.log
-
-# Ignore database config file with sensitive credentials
-app/db_config.php
