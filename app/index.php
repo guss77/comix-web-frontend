@@ -11,26 +11,9 @@ if (file_exists($dotenv)) {
 }
 
 
-// Load database configuration from standalone file
-$dbConfig = require __DIR__ . '/db_config.php';
-$dbHost = $dbConfig['host'];
-$dbName = $dbConfig['dbname'];
-$dbUser = $dbConfig['user'];
-$dbPass = $dbConfig['password'];
 
-try {
-    $pdo = new PDO(
-        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
-        $dbUser,
-        $dbPass,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo "<h1>Database connection failed</h1>";
-    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
-    exit;
-}
+require_once __DIR__ . '/db.php';
+$pdo = get_pdo();
 
 // Example: List comics table
 $stmt = $pdo->query('SHOW TABLES');
@@ -45,7 +28,6 @@ $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 </head>
 <body>
     <h1>Welcome to Comix Web Frontend</h1>
-    <p>Connected to database: <strong><?= htmlspecialchars($dbName) ?></strong></p>
     <h2>Tables</h2>
     <ul>
         <?php foreach ($tables as $table): ?>
